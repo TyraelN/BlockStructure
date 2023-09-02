@@ -1,0 +1,4 @@
+name: BlockStructure
+version: '${project.version}'
+main: de.ethosprojekt.blockstructure.BlockStructure
+api-version: '1.20'
