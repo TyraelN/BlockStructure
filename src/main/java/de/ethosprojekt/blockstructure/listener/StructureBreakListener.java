@@ -1,5 +1,6 @@
-package de.ethosprojekt.blockstructure;
+package de.ethosprojekt.blockstructure.listener;
 
+import de.ethosprojekt.blockstructure.register.WorldRegistry;
 import de.ethosprojekt.blockstructure.structures.ItemDisplayStruct;
 import de.ethosprojekt.blockstructure.structures.Structure;
 import org.bukkit.block.Block;
@@ -20,18 +21,18 @@ import java.util.Map;
 
 
 public class StructureBreakListener implements Listener {
-    private final StructureRegister register;
+    private final WorldRegistry register;
     private final Map<ItemDisplayStruct, BukkitTask> tasks = Collections.synchronizedMap(new HashMap<>());
     private final JavaPlugin plugin;
 
-    public StructureBreakListener(JavaPlugin plugin, StructureRegister register) {
+    public StructureBreakListener(JavaPlugin plugin, WorldRegistry register) {
         this.plugin = plugin;
         this.register = register;
     }
 
     @EventHandler
     public void onBlockDamage(BlockDamageEvent event) {
-        Structure structure = register.getStructure(event.getBlock().getLocation());
+        Structure structure = register.getChunkRegistry(event.getPlayer().getWorld()).getStructure(event.getBlock().getLocation());
         if (structure instanceof ItemDisplayStruct struct) {
             tasks.put(struct, new StructureBreakTask(event.getBlock(), event.getPlayer(), struct).runTaskTimer(plugin, 0, struct.getBreakTicks(event.getItemInHand())));
         }
@@ -39,7 +40,7 @@ public class StructureBreakListener implements Listener {
 
     @EventHandler
     public void onBlockDamageAbort(BlockDamageAbortEvent event) {
-        Structure structure = register.getStructure(event.getBlock().getLocation());
+        Structure structure = register.getChunkRegistry(event.getPlayer().getWorld()).getStructure(event.getBlock().getLocation());
         if (structure instanceof ItemDisplayStruct struct) {
             struct.updateItem(struct.getItem().asOne());
             if (tasks.get(struct) != null) {

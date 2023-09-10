@@ -1,5 +1,6 @@
-package de.ethosprojekt.blockstructure;
+package de.ethosprojekt.blockstructure.listener;
 
+import de.ethosprojekt.blockstructure.register.WorldRegistry;
 import de.ethosprojekt.blockstructure.structures.ItemDisplayStruct;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -13,9 +14,9 @@ import java.util.Set;
 
 
 public class PlacementListener implements Listener {
-    private final StructureRegister register;
+    private final WorldRegistry register;
 
-    public PlacementListener(StructureRegister register) {
+    public PlacementListener(WorldRegistry register) {
         this.register = register;
     }
 
@@ -32,7 +33,7 @@ public class PlacementListener implements Listener {
                 BlockVector vector = new BlockVector(block.getX(), block.getY(), block.getZ());
                 vector.add(face.getDirection());
                 custom.spawn(block.getChunk(), vector);
-                register.register(custom, block.getChunk(), Set.of(vector));
+                register.getChunkRegistry(event.getPlayer().getWorld()).register(custom, block.getChunk(), Set.of(vector));
                 event.getPlayer().sendMessage(vector.toString());
                 event.setCancelled(true);
             }
